@@ -10,29 +10,35 @@ public class Maleta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación lógica con vuelo (módulo vuelos)
-    @Column(nullable = false)
+    @Column(name = "vuelo_id", nullable = false)
     private Long vueloId;
 
-    // Relación lógica con check-in (puede ser null si es carga, por ejemplo)
+    @Column(name = "pasajero_checkin_id")
     private Long pasajeroCheckinId;
 
-    @Column(nullable = false, unique = true)
-    private String tagCode;   // código de etiqueta (IATA, etc.)
+    @Column(name = "tag_code", nullable = false, unique = true)
+    private String tagCode;
 
-    @Column(nullable = false)
+    @Column(name = "peso_kg", nullable = false)
     private double pesoKg;
 
     @Column(nullable = false)
-    private String estado;    // REGISTRADA, EN_BHS, CARGADA, DESCARGADA, EXTRAVIADA, TRANSFERENCIA
+    private String estado;
 
-    private String destinoFinal; // IATA ej: PTY, MIA
-    private String origen;       // aeropuerto origen
-    private String ubicacionActual; // cinta, hold, bodega, almacén, etc.
+    @Column(name = "destino_final")
+    private String destinoFinal;
+
+    @Column(name = "origen")
+    private String origen;
+
+    @Column(name = "ubicacion_actual")
+    private String ubicacionActual;
 
     public Maleta() {}
 
+    // ========================
     // GETTERS
+    // ========================
     public Long getId() { return id; }
     public Long getVueloId() { return vueloId; }
     public Long getPasajeroCheckinId() { return pasajeroCheckinId; }
@@ -43,7 +49,9 @@ public class Maleta {
     public String getOrigen() { return origen; }
     public String getUbicacionActual() { return ubicacionActual; }
 
+    // ========================
     // SETTERS
+    // ========================
     public void setId(Long id) { this.id = id; }
     public void setVueloId(Long vueloId) { this.vueloId = vueloId; }
     public void setPasajeroCheckinId(Long pasajeroCheckinId) { this.pasajeroCheckinId = pasajeroCheckinId; }

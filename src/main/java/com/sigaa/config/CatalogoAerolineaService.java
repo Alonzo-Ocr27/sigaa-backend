@@ -1,6 +1,7 @@
 package com.sigaa.config;
 
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -12,17 +13,39 @@ public class CatalogoAerolineaService {
         this.repo = repo;
     }
 
+    // ======================================================
+    // CREAR
+    // ======================================================
     public CatalogoAerolinea crear(CatalogoAerolinea a) {
+
+        if (repo.existsByCodigo(a.getCodigo())) {
+            throw new RuntimeException("El código ya está registrado");
+        }
+
         return repo.save(a);
     }
 
+    // ======================================================
+    // LISTAR
+    // ======================================================
     public List<CatalogoAerolinea> listar() {
         return repo.findAll();
     }
 
+    // ======================================================
+    // ACTUALIZAR
+    // ======================================================
     public CatalogoAerolinea actualizar(Long id, CatalogoAerolinea datos) {
+
         CatalogoAerolinea a = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aerolinea no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Aerolínea no encontrada"));
+
+        // validar código repetido si cambia
+        if (!a.getCodigo().equals(datos.getCodigo())
+                && repo.existsByCodigo(datos.getCodigo())) {
+
+            throw new RuntimeException("El código ya está registrado por otra aerolínea");
+        }
 
         a.setCodigo(datos.getCodigo());
         a.setNombre(datos.getNombre());
@@ -30,9 +53,13 @@ public class CatalogoAerolineaService {
         return repo.save(a);
     }
 
-    public boolean eliminar(Long id) {
-        if (!repo.existsById(id)) return false;
+    // ======================================================
+    // ELIMINAR
+    // ======================================================
+    public void eliminar(Long id) {
+        if (!repo.existsById(id)) {
+            throw new RuntimeException("Aerolínea no encontrada");
+        }
         repo.deleteById(id);
-        return true;
     }
 }

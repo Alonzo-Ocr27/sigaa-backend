@@ -90,4 +90,9 @@ public class PasajeroCheckinService {
         PasajeroCheckin p = repo.findByCodigoBoardingPass(codigo);
         return p == null ? null : new PasajeroCheckinDTO(p);
     }
+
+    public PasajeroCheckin obtenerPorBoardingPass(String codigo) {
+        return repo.findByCodigoBoardingPass(codigo);
+    }
+
 }

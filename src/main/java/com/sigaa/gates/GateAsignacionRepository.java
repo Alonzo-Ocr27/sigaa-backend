@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface GateAsignacionRepository extends JpaRepository<GateAsignacion, Long> {
 
-    // Buscar asignaciones de un vuelo
+    // Asignaciones para un vuelo
     List<GateAsignacion> findByVueloId(Long vueloId);
 
-    // Para validar si el vuelo ya tiene una gate asignada ACTIVAMENTE
+    // Validar si ya tiene una gate activa
     GateAsignacion findByVueloIdAndEstado(Long vueloId, String estado);
 }

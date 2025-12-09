@@ -12,7 +12,7 @@ public class GateAsignacion {
     private Long id;
 
     @Column(nullable = false)
-    private Long vueloId; // relación con módulo vuelos
+    private Long vueloId;
 
     @ManyToOne
     @JoinColumn(name = "gate_id", nullable = false)
@@ -22,11 +22,10 @@ public class GateAsignacion {
     private LocalDateTime fin;
 
     @Column(nullable = false)
-    private String estado; // ACTIVA, FINALIZADA, CANCELADA
+    private String estado;
 
     public GateAsignacion() {}
 
-    // === GETTERS ===
     public Long getId() { return id; }
     public Long getVueloId() { return vueloId; }
     public Gate getGate() { return gate; }
@@ -34,8 +33,7 @@ public class GateAsignacion {
     public LocalDateTime getFin() { return fin; }
     public String getEstado() { return estado; }
 
-    // === SETTERS ===
-    public void setId(Long id) { this.id = id; }             // <--- IMPORTANTE
+    public void setId(Long id) { this.id = id; }
     public void setVueloId(Long vueloId) { this.vueloId = vueloId; }
     public void setGate(Gate gate) { this.gate = gate; }
     public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/catalogos/aerolineas")
+@RequestMapping("/api/config/aerolineas")
 @CrossOrigin("*")
 public class CatalogoAerolineaController {
 
@@ -16,27 +16,57 @@ public class CatalogoAerolineaController {
         this.service = service;
     }
 
+    // =======================================
+    // CREAR
+    // =======================================
     @PostMapping("/crear")
     public ApiResponse<CatalogoAerolinea> crear(@RequestBody CatalogoAerolinea a) {
-        return new ApiResponse<>(true, "Aerolinea creada", service.crear(a));
+        return new ApiResponse<>(
+                true,
+                "Aerolínea creada",
+                service.crear(a)
+        );
     }
 
+    // =======================================
+    // LISTAR
+    // =======================================
     @GetMapping("/listar")
-    public List<CatalogoAerolinea> listar() {
-        return service.listar();
+    public ApiResponse<List<CatalogoAerolinea>> listar() {
+        return new ApiResponse<>(
+                true,
+                "OK",
+                service.listar()
+        );
     }
 
+    // =======================================
+    // EDITAR
+    // =======================================
     @PutMapping("/editar/{id}")
     public ApiResponse<CatalogoAerolinea> editar(
             @PathVariable Long id,
             @RequestBody CatalogoAerolinea datos
     ) {
-        return new ApiResponse<>(true, "Aerolinea actualizada", service.actualizar(id, datos));
+        return new ApiResponse<>(
+                true,
+                "Aerolínea actualizada",
+                service.actualizar(id, datos)
+        );
     }
 
+    // =======================================
+    // ELIMINAR
+    // =======================================
     @DeleteMapping("/eliminar/{id}")
     public ApiResponse<String> eliminar(@PathVariable Long id) {
-        boolean ok = service.eliminar(id);
-        return new ApiResponse<>(ok, ok ? "Eliminada" : "No encontrada", null);
+
+        service.eliminar(id);
+
+        return new ApiResponse<>(
+                true,
+                "Aerolinea eliminada",
+                "OK"
+        );
     }
 }

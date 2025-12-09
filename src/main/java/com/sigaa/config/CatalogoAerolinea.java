@@ -10,7 +10,7 @@ public class CatalogoAerolinea {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String codigo;  // ejemplo: "CM"
+    private String codigo;  
     private String nombre;
 
     public Long getId() { return id; }

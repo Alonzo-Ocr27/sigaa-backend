@@ -1,37 +1,42 @@
 package com.sigaa.gates;
 
 import com.sigaa.common.ApiResponse;
+import com.sigaa.seguridad.PermisosConst;
+import com.sigaa.seguridad.SeguridadService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/gates")
+@CrossOrigin("*")
 public class GateController {
 
     private final GateService gateService;
     private final GateAsignacionService asignacionService;
-    private final GateRepository gateRepo;
+    private final SeguridadService seguridadService;
 
     public GateController(GateService gateService,
                           GateAsignacionService asignacionService,
-                          GateRepository gateRepo) {
+                          SeguridadService seguridadService) {
+
         this.gateService = gateService;
         this.asignacionService = asignacionService;
-        this.gateRepo = gateRepo;
+        this.seguridadService = seguridadService;
     }
 
     // ============================================================
     // CREAR GATE
     // ============================================================
     @PostMapping("/crear")
-    public ApiResponse<Gate> crear(@RequestBody Gate gate) {
+    public ApiResponse<Gate> crear(@RequestBody Gate gate,
+                                   HttpServletRequest request) {
 
-        // Validar duplicado
-        if (gateRepo.existsByCodigo(gate.getCodigo())) {
-            return new ApiResponse<>(false,
-                    "Ya existe una gate con el código " + gate.getCodigo(),
-                    null);
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
+
+        if (!seguridadService.usuarioTienePermiso(usuarioId, PermisosConst.GATES.ESTADO)) {
+            throw new RuntimeException("No tiene permiso para crear gates");
         }
 
         Gate creada = gateService.crear(gate);
@@ -39,71 +44,78 @@ public class GateController {
     }
 
     // ============================================================
-    // LISTAR GATES
+    // LISTAR GATES (PÚBLICO)
     // ============================================================
     @GetMapping("/listar")
-    public List<Gate> listar() {
-        return gateService.listar();
+    public ApiResponse<List<Gate>> listar() {
+        return new ApiResponse<>(true, "OK", gateService.listar());
     }
 
     // ============================================================
-    // CAMBIAR ESTADO
+    // CAMBIAR ESTADO DE UNA GATE
     // ============================================================
     @PutMapping("/estado/{id}")
-    public ApiResponse<String> estado(
-            @PathVariable Long id,
-            @RequestParam String estado) {
+    public ApiResponse<String> estado(@PathVariable Long id,
+                                      @RequestParam String estado,
+                                      HttpServletRequest request) {
 
-        boolean ok = gateService.cambiarEstado(id, estado);
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
 
-        return new ApiResponse<>(
-                ok,
-                ok ? "Estado actualizado" : "Gate no encontrada",
-                null
-        );
+        if (!seguridadService.usuarioTienePermiso(usuarioId, PermisosConst.GATES.ESTADO)) {
+            throw new RuntimeException("No tiene permiso para cambiar estado de gates");
+        }
+
+        gateService.cambiarEstado(id, estado);
+
+        return new ApiResponse<>(true, "Estado actualizado correctamente", null);
     }
 
     // ============================================================
-    // ASIGNAR GATE
+    // ASIGNAR GATE A VUELO
     // ============================================================
     @PostMapping("/asignar")
-    public ApiResponse<GateAsignacion> asignar(
-            @RequestParam Long vueloId,
-            @RequestParam String tipoAeronave) {
+    public ApiResponse<GateAsignacion> asignar(@RequestParam Long vueloId,
+                                               @RequestParam String tipoAeronave,
+                                               HttpServletRequest request) {
+
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
+
+        if (!seguridadService.usuarioTienePermiso(usuarioId, PermisosConst.GATES.ASIGNAR)) {
+            throw new RuntimeException("No tiene permiso para asignar gates");
+        }
 
         if (vueloId == null) {
-            return new ApiResponse<>(false,
-                    "Debe enviar el ID del vuelo",
-                    null);
+            throw new RuntimeException("Debe enviar el ID del vuelo");
         }
 
         if (tipoAeronave == null || tipoAeronave.trim().isEmpty()) {
-            return new ApiResponse<>(false,
-                    "Debe indicar el tipo de aeronave",
-                    null);
+            throw new RuntimeException("Debe indicar el tipo de aeronave");
         }
 
         GateAsignacion asig = asignacionService.asignar(vueloId, tipoAeronave);
 
-        return new ApiResponse<>(
-                asig != null,
-                asig != null ? "Gate asignada correctamente" : "No hay gate disponible compatible",
-                asig
-        );
+        if (asig == null) {
+            throw new RuntimeException("No hay gate disponible compatible");
+        }
+
+        return new ApiResponse<>(true, "Gate asignada correctamente", asig);
     }
 
     // ============================================================
-    // FINALIZAR ASIGNACIÓN
+    // FINALIZAR ASIGNACIÓN Y LIBERAR GATE
     // ============================================================
     @PutMapping("/finalizar/{asignId}")
-    public ApiResponse<String> finalizar(@PathVariable Long asignId) {
+    public ApiResponse<String> finalizar(@PathVariable Long asignId,
+                                         HttpServletRequest request) {
 
-        boolean ok = asignacionService.finalizar(asignId);
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
 
-        return new ApiResponse<>(
-                ok,
-                ok ? "Gate liberada" : "Asignación no encontrada",
-                null
-        );
+        if (!seguridadService.usuarioTienePermiso(usuarioId, PermisosConst.GATES.ASIGNAR)) {
+            throw new RuntimeException("No tiene permiso para finalizar asignaciones");
+        }
+
+        asignacionService.finalizar(asignId);
+
+        return new ApiResponse<>(true, "Gate liberada correctamente", null);
     }
 }

@@ -10,7 +10,7 @@ public class CatalogoAeronave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String codigo; // A320, B737, E190
+    private String codigo;
     private String descripcion;
 
     public Long getId() { return id; }

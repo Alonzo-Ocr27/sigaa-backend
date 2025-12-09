@@ -33,7 +33,7 @@ public class Vuelo {
 
     public Vuelo() {}
 
-    public Long getId() { return id; }
+    public long getId() { return id; }
     public String getNumero() { return numero; }
     public String getOrigen() { return origen; }
     public String getDestino() { return destino; }

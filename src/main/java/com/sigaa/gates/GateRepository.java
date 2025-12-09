@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GateRepository extends JpaRepository<Gate, Long> {
 
-    // Contar por estado (LIBRE, OCUPADA, MANTENIMIENTO)
+    // Contar por estado
     long countByEstado(String estado);
 
-    // Validar que no existan códigos duplicados
+    // Validar código único
     boolean existsByCodigo(String codigo);
 }

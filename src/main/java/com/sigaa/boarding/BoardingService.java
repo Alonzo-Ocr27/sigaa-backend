@@ -20,13 +20,11 @@ public class BoardingService {
 
     public BoardingRegistro escanear(String codigoBP) {
 
-        // validar si el boarding pass existe
-        PasajeroCheckin pasajero = checkinService.buscarPorBoardingPass(codigoBP);
+        PasajeroCheckin pasajero = checkinService.obtenerPorBoardingPass(codigoBP);
         if (pasajero == null) {
             throw new RuntimeException("Boarding Pass inválido");
         }
 
-        // validar duplicado
         BoardingRegistro existente = repo.findByCodigoBoardingPass(codigoBP);
         if (existente != null &&
             !existente.getEstado().equals("CANCELADO")) {
@@ -36,7 +34,6 @@ public class BoardingService {
             throw new RuntimeException("El pasajero ya embarcó anteriormente");
         }
 
-        // crear registro nuevo
         BoardingRegistro nuevo = new BoardingRegistro();
         nuevo.setVueloId(pasajero.getVueloId());
         nuevo.setCodigoBoardingPass(codigoBP);

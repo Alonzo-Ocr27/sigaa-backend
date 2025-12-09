@@ -1,4 +1,4 @@
-package com.sigaa.security;
+package com.sigaa.seguridad;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -15,10 +16,10 @@ public class JwtUtil {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    public String generarToken(String usuario, String rol) {
+    public String generarToken(Long usuarioId, List<String> roles) {
         return Jwts.builder()
-                .setSubject(usuario)
-                .claim("rol", rol)
+                .claim("usuarioId", usuarioId)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRACION))
                 .signWith(key)

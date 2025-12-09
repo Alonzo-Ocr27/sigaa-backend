@@ -3,7 +3,9 @@ package com.sigaa.notificaciones;
 import com.sigaa.common.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notificaciones")
@@ -16,7 +18,7 @@ public class NotificacionController {
     }
 
     // ====================================================
-    // 📌 1. Encolar notificación manual (no enviada todavía)
+    // 📌 1. Encolar notificación manual
     // ====================================================
     @PostMapping("/encolar")
     public ApiResponse<Notificacion> encolar(
@@ -42,8 +44,8 @@ public class NotificacionController {
     // 📌 3. Enviar todas las pendientes
     // ====================================================
     @PutMapping("/enviar-pendientes")
-    public ApiResponse<Integer> enviarPendientes() {
-        int total = service.enviarPendientes();
+    public ApiResponse<Long> enviarPendientes() {
+        long total = service.enviarPendientes();
         return new ApiResponse<>(true, "Notificaciones procesadas: " + total, total);
     }
 
@@ -64,7 +66,7 @@ public class NotificacionController {
     }
 
     // ====================================================
-    // 📌 6. Enviar directamente sin encolar (compatibilidad)
+    // 📌 6. Enviar directamente sin encolar
     // ====================================================
     @PostMapping("/enviar-directo")
     public ApiResponse<String> enviarDirecto(
@@ -75,14 +77,33 @@ public class NotificacionController {
         return new ApiResponse<>(true, "Notificación enviada directamente", null);
     }
 
+    // ====================================================
+    // 📌 7. Listar todas con manejo de errores interno
+    // ====================================================
     @GetMapping
     public Object listarTodas() {
         try {
             return service.listarTodas();
         } catch (Exception e) {
-            e.printStackTrace(); // imprime stacktrace en la consola del servidor
-            return new ApiResponse<>(false, "Error interno: " + e.getClass().getSimpleName() + " - " + e.getMessage(), null);
+            e.printStackTrace();
+            return new ApiResponse<>(false,
+                    "Error interno: " + e.getClass().getSimpleName() + " - " + e.getMessage(),
+                    null);
         }
+    }
+
+    // ====================================================
+    // 📌 8. Estadísticas para Dashboard (total de pendientes)
+    // ====================================================
+    @GetMapping("/nuevas")
+    public ApiResponse<Map<String, Long>> nuevas() {
+
+        long total = service.contarPendientes();
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("total", total);
+
+        return new ApiResponse<>(true, "OK", data);
     }
 
 }

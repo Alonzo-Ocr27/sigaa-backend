@@ -1,4 +1,4 @@
-package com.sigaa.security;
+package com.sigaa.seguridad;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.Filter;
@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter implements Filter {
@@ -39,33 +40,13 @@ public class JwtFilter implements Filter {
             return;
         }
 
-        // RUTAS PÚBLICAS
-        if (uri.startsWith("/api/auth/login") ||
-            uri.startsWith("/api/auth/registrar") ||
-            uri.startsWith("/api/notificaciones") ||
-            req.getRequestURI().contains("/api/vuelos") ||
-            req.getRequestURI().contains("/api/configuracion") ||
-            req.getRequestURI().contains("/api/reservas") ||
-            req.getRequestURI().contains("/api/pagos") ||
-            req.getRequestURI().contains("/api/usuarios") ||
-            req.getRequestURI().contains("/api/aerolineas") ||
-            req.getRequestURI().contains("/api/destinos") ||
-            req.getRequestURI().contains("/api/aeronaves") ||
-            req.getRequestURI().contains("/api/paradas") ||
-            req.getRequestURI().contains("/api/reportes") ||
-            req.getRequestURI().contains("/api/comercial") ||
-            req.getRequestURI().contains("/api/documentacion") ||
-            req.getRequestURI().contains("/api/checkin") ||
-            req.getRequestURI().contains("/api/public") ||
-            req.getRequestURI().contains("/api/test") ||
-            req.getRequestURI().contains("/api/swagger-ui/") ||
-            req.getRequestURI().contains("/api/v3/api-docs")) {
-
+        // ==== RUTAS PÚBLICAS SIN TOKEN ====
+        if (esRutaPublica(uri)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // VALIDAR TOKEN
+        // ==== VALIDAR TOKEN ====
         if (auth == null || !auth.startsWith("Bearer ")) {
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token requerido");
             return;
@@ -74,7 +55,14 @@ public class JwtFilter implements Filter {
         try {
             String token = auth.substring(7);
             Claims claims = jwtUtil.validarToken(token);
-            request.setAttribute("rol", claims.get("rol"));
+
+            Long usuarioId = claims.get("usuarioId", Long.class);
+            List<String> roles = (List<String>) claims.get("roles");
+
+            // Guardamos en request para usarlo en auditoría o permisos
+            req.setAttribute("usuarioId", usuarioId);
+            req.setAttribute("roles", roles);
+
         } catch (Exception e) {
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
             return;
@@ -82,4 +70,24 @@ public class JwtFilter implements Filter {
 
         chain.doFilter(request, response);
     }
+
+
+    // -----------------------
+    //  RUTAS PÚBLICAS
+    // -----------------------
+    private boolean esRutaPublica(String uri) {
+        return uri.startsWith("/api/auth/")
+            || uri.startsWith("/api/public/")
+            || uri.startsWith("/api/vuelos/")
+            || uri.startsWith("/api/embarque/")
+            || uri.startsWith("/api/checkin/")
+            || uri.startsWith("/api/comercial/")
+            || uri.startsWith("/api/reportes/")
+            || uri.startsWith("/api/notificaciones/")
+            || uri.startsWith("/api/dashboard/")
+            || uri.startsWith("/api/config/");
+        }
+
+
+
 }

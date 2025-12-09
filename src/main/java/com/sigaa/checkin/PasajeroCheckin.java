@@ -11,10 +11,10 @@ public class PasajeroCheckin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "vuelo_id", nullable = false)
     private Long vueloId;
 
-    @Column(nullable = false)
+    @Column(name = "nombre_completo", nullable = false)
     private String nombreCompleto;
 
     @Column(nullable = false)
@@ -23,20 +23,21 @@ public class PasajeroCheckin {
     @Column(nullable = false)
     private String asiento;
 
-    @Column(nullable = false)
+    @Column(name = "cantidad_maletas", nullable = false)
     private int cantidadMaletas;
 
     @Column(nullable = false)
     private String estado; // PENDIENTE, COMPLETADO, CANCELADO
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "codigo_boarding_pass", nullable = false, unique = true)
     private String codigoBoardingPass;
 
+    @Column(name = "fecha_hora_checkin")
     private LocalDateTime fechaHoraCheckin;
 
-    public PasajeroCheckin() {}
-
+    // ============================
     // GETTERS
+    // ============================
     public Long getId() { return id; }
     public Long getVueloId() { return vueloId; }
     public String getNombreCompleto() { return nombreCompleto; }
@@ -47,7 +48,9 @@ public class PasajeroCheckin {
     public String getCodigoBoardingPass() { return codigoBoardingPass; }
     public LocalDateTime getFechaHoraCheckin() { return fechaHoraCheckin; }
 
+    // ============================
     // SETTERS
+    // ============================
     public void setId(Long id) { this.id = id; }
     public void setVueloId(Long vueloId) { this.vueloId = vueloId; }
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }

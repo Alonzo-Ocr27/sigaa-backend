@@ -11,4 +11,7 @@ public interface NotificacionRepository extends JpaRepository<Notificacion, Long
 
     // Historial de un usuario
     List<Notificacion> findByUsuarioIdOrderByFechaCreacionDesc(Long usuarioId);
+
+    // 👉 MÉTODO FALTANTE
+    long countByEstado(String estado);
 }

@@ -18,16 +18,15 @@ public class NotificacionService {
     // ============================================================
     public void enviar(String titulo, String mensaje) {
 
-        // Canal por defecto para el sistema (no usuario)
         String canal = "SISTEMA";
-        Long usuarioId = null; // ahora se permite null
+        Long usuarioId = null;
 
         Notificacion n = encolar(usuarioId, canal, titulo, mensaje);
         enviarAhora(n.getId());
     }
 
     // ============================================================
-    // ENCOLAR UNA NOTIFICACIÓN (no se envía aún)
+    // ENCOLAR UNA NOTIFICACIÓN
     // ============================================================
     public Notificacion encolar(Long usuarioId, String canal,
                                 String titulo, String mensaje) {
@@ -51,7 +50,7 @@ public class NotificacionService {
     }
 
     // ============================================================
-    // ENVIAR UNA NOTIFICACIÓN INMEDIATAMENTE
+    // ENVIAR UNA NOTIFICACIÓN INDIVIDUAL
     // ============================================================
     public Notificacion enviarAhora(Long id) {
 
@@ -59,13 +58,11 @@ public class NotificacionService {
         if (n == null) return null;
 
         try {
-            // Aquí podrás integrar: SMTP, SMS, Push, etc.
             n.setEstado("ENVIADA");
             n.setFechaEnvio(LocalDateTime.now());
             n.setErrorDetalle(null);
 
         } catch (Exception e) {
-
             n.setEstado("ERROR");
             n.setErrorDetalle(e.getMessage());
         }
@@ -74,11 +71,11 @@ public class NotificacionService {
     }
 
     // ============================================================
-    // ENVIAR TODAS LAS PENDIENTES (para CRON o tarea manual)
+    // ENVIAR TODAS LAS PENDIENTES
     // ============================================================
-    public int enviarPendientes() {
+    public long enviarPendientes() {
         List<Notificacion> pendientes = repo.findByEstado("PENDIENTE");
-        int total = 0;
+        long total = 0;
 
         for (Notificacion n : pendientes) {
             enviarAhora(n.getId());
@@ -103,4 +100,7 @@ public class NotificacionService {
         return repo.findAll();
     }
 
+    public long contarPendientes() {
+        return repo.countByEstado("PENDIENTENTE");
+    }
 }

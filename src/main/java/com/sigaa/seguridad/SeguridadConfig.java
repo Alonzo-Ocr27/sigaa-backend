@@ -18,9 +18,14 @@ public class SeguridadConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(auditoriaInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns(
-                        "/api/auth/**",     // login, registro
-                        "/api/health/**"    // si manejas health-check
-                );
+
+                // rutas públicas que NO deben auditarse
+                .excludePathPatterns("/api/auth/login")
+                .excludePathPatterns("/api/auth/registrar")
+                .excludePathPatterns("/api/public/**")
+                .excludePathPatterns("/api/swagger-ui/**")
+                .excludePathPatterns("/api/v3/api-docs/**")
+                .excludePathPatterns("/api/test/**")
+                .excludePathPatterns("/api/health/**");
     }
 }

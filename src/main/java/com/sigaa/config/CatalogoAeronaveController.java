@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/catalogos/aeronaves")
+@RequestMapping("/api/config/aeronaves")
 @CrossOrigin("*")
 public class CatalogoAeronaveController {
 
@@ -16,16 +16,25 @@ public class CatalogoAeronaveController {
         this.service = service;
     }
 
+    // =====================================
+    // CREAR
+    // =====================================
     @PostMapping("/crear")
     public ApiResponse<CatalogoAeronave> crear(@RequestBody CatalogoAeronave a) {
         return new ApiResponse<>(true, "Aeronave creada", service.crear(a));
     }
 
+    // =====================================
+    // LISTAR
+    // =====================================
     @GetMapping("/listar")
-    public List<CatalogoAeronave> listar() {
-        return service.listar();
+    public ApiResponse<List<CatalogoAeronave>> listar() {
+        return new ApiResponse<>(true, "OK", service.listar());
     }
 
+    // =====================================
+    // EDITAR
+    // =====================================
     @PutMapping("/editar/{id}")
     public ApiResponse<CatalogoAeronave> editar(
             @PathVariable Long id,
@@ -34,9 +43,18 @@ public class CatalogoAeronaveController {
         return new ApiResponse<>(true, "Aeronave actualizada", service.actualizar(id, datos));
     }
 
+    // =====================================
+    // ELIMINAR
+    // =====================================
     @DeleteMapping("/eliminar/{id}")
     public ApiResponse<String> eliminar(@PathVariable Long id) {
-        boolean ok = service.eliminar(id);
-        return new ApiResponse<>(ok, ok ? "Aeronave eliminada" : "No encontrada", null);
+
+        service.eliminar(id);
+
+        return new ApiResponse<>(
+                true,
+                "Aeronave eliminada",
+                "OK"
+        );
     }
 }
